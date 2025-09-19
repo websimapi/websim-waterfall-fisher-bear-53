@@ -83,15 +83,15 @@ export function createFish(scene, score = 0, type = 'classic', opts = {}, addToS
     group.userData = {
         velocity: new THREE.Vector3(0, 0, swimSpeed),
         initialX: xPos, baseY,
-        swimFrequency: Math.random() * 6 + 3,
+        swimFrequency: Math.random() * 1.9 + 1.6,
         swimAmplitude: Math.random() * 0.55 + 0.35,
         swimTimer: Math.random() * Math.PI * 2,
         baseRotY: group.rotation.y,
         prevX: xPos,
         tailV, tailH, dorsal, anal, pectoralL, pectoralR,
-        segments: segmentsArr, wiggleAmp: 0.2, wiggleFreq: 3.2,
+        segments: segmentsArr, wiggleAmp: 0.2, wiggleFreq: 1.6,
         wiggleRotAmp: 0.22,
-        tailMaxRot: 0.2, // increased for stronger tail swing
+        tailMaxRot: 0.16,
         pattern: opts.pattern || ['sine','zigzag','drift'][Math.floor(Math.random()*3)],
         drift: 0
     };
@@ -110,7 +110,7 @@ export function updateFish(fish) {
     // forward motion
     fish.position.add(ud.velocity);
     // lateral weave
-    ud.swimTimer += 0.11;
+    ud.swimTimer += 0.07;
     let weave = 0;
     if (ud.pattern === 'sine') {
         weave = Math.sin(ud.swimTimer * ud.swimFrequency) * ud.swimAmplitude;
@@ -132,20 +132,20 @@ export function updateFish(fish) {
     // orientation: slight yaw + bank based on turn rate
     const dx = fish.position.x - ud.prevX;
     ud.prevX = fish.position.x;
-    fish.rotation.y = ud.baseRotY + Math.sin(ud.swimTimer * ud.swimFrequency) * 0.2;
+    fish.rotation.y = ud.baseRotY + Math.sin(ud.swimTimer * ud.swimFrequency) * 0.12;
     fish.rotation.z = THREE.MathUtils.clamp(-dx * 0.6, -0.3, 0.3);
     // tail wag and fin flaps
     const turn = Math.abs(dx);
     const damp = THREE.MathUtils.clamp(1 - turn * 8, 0.35, 1);
-    const tailSwing = Math.sin(ud.swimTimer * 2.2) * (ud.tailMaxRot || 0.2) * damp;
+    const tailSwing = Math.sin(ud.swimTimer * 1.6) * (ud.tailMaxRot || 0.16) * damp;
     if (ud.tailV) ud.tailV.rotation.y = tailSwing;
     if (ud.tailH) ud.tailH.rotation.y = tailSwing;
-    const finFlap = Math.sin(ud.swimTimer * 3.2) * 0.35;
+    const finFlap = Math.sin(ud.swimTimer * 2.0) * 0.35;
     if (ud.pectoralL) ud.pectoralL.rotation.z = 0.2 + finFlap;
     if (ud.pectoralR) ud.pectoralR.rotation.z = -0.2 - finFlap;
 
     // spine wiggle across segments - rotate around Y to avoid geometry overlap
-    const spinePhase = ud.swimTimer * (ud.wiggleFreq || 3.2);
+    const spinePhase = ud.swimTimer * (ud.wiggleFreq || 1.6);
     if (ud.segments) for (const s of ud.segments) {
         const ramp = Math.pow(THREE.MathUtils.smoothstep(s.phase, 0.35, 0.98), 1.2); // keep head stable, tail flexible
         const localAmp = (ud.wiggleRotAmp || 0.22) * 1.0 * ramp;
