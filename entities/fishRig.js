@@ -30,7 +30,7 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
   const boneCount = 9;
   const length = 3.2;
   const segLen = length / boneCount;
-  const maxW = 0.85, maxH = 1.0;
+  const maxW = 0.95, maxH = 1.05;
 
   const root = new THREE.Object3D(); root.name = 'root';
   group.add(root);
@@ -41,8 +41,8 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
 
   for (let i = 0; i < boneCount; i++) {
     const t = i / (boneCount - 1);
-    const w = THREE.MathUtils.lerp(maxW, 0.32, t);
-    const h = THREE.MathUtils.lerp(maxH, 0.38, t);
+    const w = THREE.MathUtils.lerp(maxW, 0.28, t);
+    const h = THREE.MathUtils.lerp(maxH, 0.32, t);
 
     const pivot = new THREE.Object3D(); pivot.name = `bone_${i}`;
     pivot.position.z = i === 0 ? -0.4 : segLen; // first bone starts near head
@@ -63,16 +63,16 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
 
   // Tail at end bone
   const tailBaseZ = segLen * 0.5 + 0.10;
-  const tailBase = createVoxel(0, 0.0, tailBaseZ - 0.10, 0.20, 0.50, 0.14, fishTailMat);
-  const tailV = createVoxel(0, 0.0, tailBaseZ + 0.02, 0.035, 0.46, 0.25, fishTailMat);
-  const tailH = createVoxel(0, -0.05, tailBaseZ - 0.04, 0.26, 0.045, 0.16, fishTailMat);
+  const tailBase = createVoxel(0, 0.0, tailBaseZ - 0.10, 0.24, 0.60, 0.14, fishTailMat);
+  const tailV = createVoxel(0, 0.0, tailBaseZ + 0.02, 0.045, 0.56, 0.30, fishTailMat);
+  const tailH = createVoxel(0, -0.05, tailBaseZ - 0.04, 0.32, 0.050, 0.18, fishTailMat);
   bones[bones.length - 1].add(tailBase, tailV, tailH);
 
   // Fins attached near head/body
-  const dorsal = createVoxel(0, 0.55, 0.9, 0.1, 0.25, 0.9, finMat);
-  const anal   = createVoxel(0, -0.55, 1.1, 0.1, 0.22, 0.8, finMat);
-  const pectoralL = createVoxel(0.42, -0.05, 0.4, 0.06, 0.18, 0.35, finMat);
-  const pectoralR = createVoxel(-0.42, -0.05, 0.4, 0.06, 0.18, 0.35, finMat);
+  const dorsal = createVoxel(0, 0.55, 0.9, 0.10, 0.30, 1.10, finMat);
+  const anal   = createVoxel(0, -0.55, 1.1, 0.10, 0.26, 0.95, finMat);
+  const pectoralL = createVoxel(0.46, -0.05, 0.42, 0.08, 0.20, 0.38, finMat);
+  const pectoralR = createVoxel(-0.46, -0.05, 0.42, 0.08, 0.20, 0.38, finMat);
   const pelvicL = createVoxel(0.22, -0.45, 1.0, 0.08, 0.16, 0.25, finMat);
   const pelvicR = createVoxel(-0.22, -0.45, 1.0, 0.08, 0.16, 0.25, finMat);
   group.add(dorsal, anal, pectoralL, pectoralR, pelvicL, pelvicR);
@@ -99,8 +99,8 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
   group.userData = {
     velocity: new THREE.Vector3(0, 0, swimSpeed),
     initialX: xPos, baseY,
-    swimFrequency: Math.random() * 1.7 + 1.4,
-    swimAmplitude: Math.random() * 0.55 + 0.35,
+    swimFrequency: Math.random() * 0.6 + 0.9,
+    swimAmplitude: Math.random() * 0.20 + 0.25,
     swimTimer: Math.random() * Math.PI * 2,
     baseRotY: group.rotation.y,
     prevX: xPos,
@@ -133,14 +133,14 @@ export function updateRiggedFish(fish) {
     weave = Math.sin(ud.swimTimer * ud.swimFrequency) * ud.swimAmplitude;
   } else if (ud.pattern === 'zigzag') {
     const tri = 2 / Math.PI * Math.asin(Math.sin(ud.swimTimer * ud.swimFrequency));
-    weave = tri * ud.swimAmplitude * 1.1;
+    weave = tri * ud.swimAmplitude * 0.8;
   } else {
-    ud.drift += (Math.random() - 0.5) * 0.02;
-    ud.drift = THREE.MathUtils.clamp(ud.drift, -0.6, 0.6);
+    ud.drift += (Math.random() - 0.5) * 0.01;
+    ud.drift = THREE.MathUtils.clamp(ud.drift, -0.4, 0.4);
     weave = ud.drift;
   }
   const targetX = ud.initialX + weave;
-  fish.position.x = THREE.MathUtils.lerp(fish.position.x, targetX, 0.18);
+  fish.position.x = THREE.MathUtils.lerp(fish.position.x, targetX, 0.10);
 
   // Vertical bob
   const bob = Math.sin(ud.swimTimer * 0.8 + 1.3) * 0.04 + Math.sin(ud.swimTimer * 1.7) * 0.03;
