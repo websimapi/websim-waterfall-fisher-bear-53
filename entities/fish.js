@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { createRiggedFish, updateRiggedFish } from './fishRig.js';
 
 const fishMat = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
 const fishTailMat = new THREE.MeshLambertMaterial({ color: 0xff4500 });
@@ -20,12 +21,10 @@ function createVoxel(x, y, z, w, h, d, mat) {
 }
 
 export function createFish(scene, score = 0, type = 'classic', opts = {}, addToScene = true) {
-    const { createRiggedFish } from './fishRig.js';
     return createRiggedFish({ scene, score, type, opts, addToScene });
 }
 
 export function updateFish(fish) {
-    const { updateRiggedFish } from './fishRig.js';
     updateRiggedFish(fish);
 }
 
