@@ -1,5 +1,3 @@
-
-```javascript
 import * as THREE from 'three';
 
 const fishMat = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
