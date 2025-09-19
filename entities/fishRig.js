@@ -30,7 +30,7 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
   const boneCount = 9;
   const length = 3.2;
   const segLen = length / boneCount;
-  const maxW = 0.95, maxH = 1.05;
+  const maxW = isVitiligo ? 0.95 : 1.05, maxH = isVitiligo ? 1.05 : 1.15;
 
   const root = new THREE.Object3D(); root.name = 'root';
   group.add(root);
@@ -41,8 +41,9 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
 
   for (let i = 0; i < boneCount; i++) {
     const t = i / (boneCount - 1);
-    const w = THREE.MathUtils.lerp(maxW, 0.28, t);
-    const h = THREE.MathUtils.lerp(maxH, 0.32, t);
+    let w = THREE.MathUtils.lerp(maxW, 0.28, t);
+    let h = THREE.MathUtils.lerp(maxH, 0.32, t);
+    if (!isVitiligo) { const mid = 1 - Math.abs(t - 0.4) / 0.4; const bulge = 1 + 0.25 * Math.max(0, mid); w *= bulge; h *= bulge; }
 
     const pivot = new THREE.Object3D(); pivot.name = `bone_${i}`;
     pivot.position.z = i === 0 ? -0.4 : segLen; // first bone starts near head
@@ -68,24 +69,32 @@ export function createRiggedFish({ scene, score = 0, type = 'classic', opts = {}
   const tailH = createVoxel(0, -0.05, tailBaseZ - 0.04, 0.32, 0.050, 0.18, fishTailMat);
   bones[bones.length - 1].add(tailBase, tailV, tailH);
 
-  // Fins attached near head/body
-  const dorsal = createVoxel(0, 0.55, 0.9, 0.10, 0.30, 1.10, finMat);
-  const anal   = createVoxel(0, -0.55, 1.1, 0.10, 0.26, 0.95, finMat);
-  const pectoralL = createVoxel(0.46, -0.05, 0.42, 0.08, 0.20, 0.38, finMat);
-  const pectoralR = createVoxel(-0.46, -0.05, 0.42, 0.08, 0.20, 0.38, finMat);
-  const pelvicL = createVoxel(0.22, -0.45, 1.0, 0.08, 0.16, 0.25, finMat);
-  const pelvicR = createVoxel(-0.22, -0.45, 1.0, 0.08, 0.16, 0.25, finMat);
+  // Fins attached near head/body (made larger for classic)
+  const dorsal = createVoxel(0, 0.55, 0.9, 0.12, (isVitiligo?0.30:0.42), (isVitiligo?1.10:1.25), finMat);
+  const anal   = createVoxel(0, -0.55, 1.1, 0.12, (isVitiligo?0.26:0.36), (isVitiligo?0.95:1.10), finMat);
+  const pectoralL = createVoxel(0.48, -0.05, 0.42, 0.10, 0.24, (isVitiligo?0.38:0.50), finMat);
+  const pectoralR = createVoxel(-0.48, -0.05, 0.42, 0.10, 0.24, (isVitiligo?0.38:0.50), finMat);
+  const pelvicL = createVoxel(0.24, -0.45, 1.0, 0.10, 0.18, (isVitiligo?0.25:0.34), finMat);
+  const pelvicR = createVoxel(-0.24, -0.45, 1.0, 0.10, 0.18, (isVitiligo?0.25:0.34), finMat);
   group.add(dorsal, anal, pectoralL, pectoralR, pelvicL, pelvicR);
 
   // Head details
   group.add(createVoxel(0, 0.0, 0.25, 0.7, 0.6, 0.15, bellyMat));
-  const scleraL = createVoxel(0.30, 0.24, 0.08, 0.24, 0.24, 0.22, scleraMat);
-  const scleraR = createVoxel(-0.30, 0.24, 0.08, 0.24, 0.24, 0.22, scleraMat);
-  const pupilL  = createVoxel(0.32, 0.24, 0.14, 0.10, 0.10, 0.06, pupilMat);
-  const pupilR  = createVoxel(-0.32, 0.24, 0.14, 0.10, 0.10, 0.06, pupilMat);
-  const highlightL = createVoxel(0.36, 0.29, 0.16, 0.04, 0.04, 0.03, scleraMat);
-  const highlightR = createVoxel(-0.36, 0.29, 0.16, 0.04, 0.04, 0.03, scleraMat);
-  group.add(scleraL, scleraR, pupilL, pupilR, highlightL, highlightR);
+  if (isVitiligo) {
+    const scleraL = createVoxel(0.30, 0.24, 0.08, 0.24, 0.24, 0.22, scleraMat);
+    const scleraR = createVoxel(-0.30, 0.24, 0.08, 0.24, 0.24, 0.22, scleraMat);
+    const pupilL  = createVoxel(0.32, 0.24, 0.14, 0.10, 0.10, 0.06, pupilMat);
+    const pupilR  = createVoxel(-0.32, 0.24, 0.14, 0.10, 0.10, 0.06, pupilMat);
+    const highlightL = createVoxel(0.36, 0.29, 0.16, 0.04, 0.04, 0.03, scleraMat);
+    const highlightR = createVoxel(-0.36, 0.29, 0.16, 0.04, 0.04, 0.03, scleraMat);
+    group.add(scleraL, scleraR, pupilL, pupilR, highlightL, highlightR);
+  } else {
+    const eyeL = createVoxel(0.30, 0.24, 0.12, 0.18, 0.18, 0.10, pupilMat);
+    const eyeR = createVoxel(-0.30, 0.24, 0.12, 0.18, 0.18, 0.10, pupilMat);
+    group.add(eyeL, eyeR);
+  }
+  const mouth = createVoxel(0, -0.12, 0.00, 0.16, 0.10, 0.06, finMat);
+  group.add(mouth);
 
   // Placement and kinematics
   const riverWidth = 7;

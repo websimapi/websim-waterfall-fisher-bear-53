@@ -138,16 +138,16 @@ function setupShowcaseAnimation() {
           .onUpdate(() => {
               const ud = showcaseFish.userData || {};
               const phase = wiggle.t;
-              const tailSwing = Math.sin(phase) * 0.14; // gentler showcase wiggle, reduced to avoid clipping
+              const tailSwing = Math.sin(phase) * 0.18;
               if (ud.tailV) ud.tailV.rotation.y = tailSwing;
               if (ud.tailH) ud.tailH.rotation.y = tailSwing;
-               if (ud.segments) {
+              if (ud.segments) {
                    for (const s of ud.segments) {
-                       const ramp = Math.min(1, Math.max(0, (s.phase - 0.55) / 0.4)); // tail-biased wiggle
-                       const amp = (ud.wiggleRotAmp ? ud.wiggleRotAmp * 0.45 : 0.14) * ramp;
+                       const ramp = Math.min(1, Math.max(0, (s.phase - 0.55) / 0.4));
+                       const amp = (ud.wiggleRotAmp ? ud.wiggleRotAmp * 0.60 : 0.18) * ramp;
                        s.mesh.rotation.y = (s.baseRotY || 0) + Math.sin(phase + s.phase * Math.PI) * amp;
                    }
-               }
+              }
           })
           .repeat(Infinity)
           .yoyo(true)
